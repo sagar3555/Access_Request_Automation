@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+        <title>Unix Request Login</title>
+       <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+       <link rel="stylesheet" href="static/bootstrap-theme.min.css">
+       <style>
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color:red;
+		}
+
+		li {
+			float: right;
+		}
+
+		li a {
+			display: block;
+			padding: 8px;
+			background-color: red;
+			text-align: center;
+		}
+		</style>
+ 
+    </head>
+    <body>
+ 
+ <ul> 
+	<span>
+	<li style="float:left"> <a ><img src="static/ica_logo.png" width="35" height="35" /> </a> </li>
+	<li style='float:left'> <p ><font color= "white" style="font-size: 200%">Unix Access Request Login</font></p> </li>
+	
+</ul>
+
+<div class="container">
+ 
+ 
+	<br>
+	<br>
+	<br>
+	<br>
+  <form  action="" method="post" role="form">
+    {{ form.csrf }}
+    <div class="form-group">
+      <label for="login_id">  Login Id:</label>
+      <input type="text" class="form-control" id="login_id" name="login_id" pattern="[a-z][a-z][a-z][a-z][a-z][a-z]" title="Login Id should only contain 6 lowercase letters , Login Id should not include domain name" placeholder="Enter login Id " required>
+      <br>
+      <label for="password"> Password</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+      
+	  
+ 
+ 
+    </div>
+    <button type="submit" onClick="confSubmit(this.form)" class="btn btn-success">Login</button>
+  </form>
+  <script>
+	var input = document.getElementById('login_id');
+	input.oninvalid = "this.setCustomValidity(this.willValidate?'':'Login Id should only contain 6 lowercase letters , Login Id should not include domain name')"
+    //event.target.setCustomValidity('Login Id should only contain 6 lowercase letters , Login Id should not include domain name');
+	
+  
+  </script>
+  
+ 
+  <br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+ 
+        {% for message in messages %}
+            {% if "Login Id or Password is Incorrect" not in message[1]: %}
+                <div class="alert alert-info">
+                <strong>Success! </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+ 
+            {% if "Login Id or Password is Incorrect" in message[1]: %}
+                <div class="alert alert-danger">
+                {{ message[1] }}
+                </div>
+            {% endif %}
+        {% endfor %}
+            {% endif %}
+        {% endwith %}
+ 
+</div>
+         
+</div>
+</div>
+</body>
+</html>

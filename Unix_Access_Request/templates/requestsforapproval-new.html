@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+		<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+		
+		<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>		
+		<style>
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color:red;
+		}
+
+		li {
+			float: right;
+		}
+
+		li a {
+			display: block;
+			padding: 8px;
+			background-color: red;
+			text-align: center;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="container" >
+		
+		<ul> 
+			<span>
+				<li style="float:left"> <a ><img src="static/ica_logo.png" width="35" height="35" /> </a> </li>
+				<li style='float: left;'> <a ><font color= "white">Request's For Your Approval {{session.user}} </font></a> </li>
+				<li><a   href="http://10.102.112.150/home" > <font color= "white" >Home</font></a></li>
+				<li><a   href="http://10.102.112.150/unixcaccessrequest" > <font color= "white" >Raise New Request</font></a></li>
+				<li><a  href="http://10.102.112.150/logout" ><font color= "white">Logout</font></a></li>
+			</span>
+		</ul>
+		
+		
+			<table  id="example" class="display" >
+				<tr>
+					<th>Request Id </th>
+					<th> Requested For	</th>
+					<th>Requested Date</th>
+					<th>List of Server </th>
+					<th>Status</th>
+					<th>Click Here To See More Details/Approve</th>
+				</tr>
+				{% for item in requests %}
+				<tr>
+					<td>{{item.request_id}}</td>
+					<td>{{item.requested_for}}</td>
+					<td> {{item.datetime}}
+					<td>{{item.server_list_final}}</td>
+					<td>{{item.status}}</td>
+					<td>    <a href={{item.link}} >Click Here To See More Details/Approve</a></td>
+				</tr>
+				{% endfor %}
+			</table>
+			
+			
+			
+			
+		</div>
+		<script>
+		$(document).ready(function() {
+    $('#example').DataTable( {
+        columnDefs: [ {
+            targets: [ 0 ],
+            orderData: [ 0, 1 ]
+        }, {
+            targets: [ 1 ],
+            orderData: [ 1, 0 ]
+        }, {
+            targets: [ 4 ],
+            orderData: [ 4, 0 ]
+        } ]
+    } );
+} );
+		</script>
+	</body>
+</html>

@@ -1,0 +1,61 @@
+<html>
+	<head>
+		<link rel="stylesheet" media="screen" href="{{url_for('static', filename='bootstrap.min.css')}}" >
+		<link rel="stylesheet" media="screen" href="{{url_for('static', filename='bootstrap-theme.min.css')}}" >
+		<style>
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color:red;
+		}
+
+		li {
+			float: right;
+		}
+
+		li a {
+			display: block;
+			padding: 8px;
+			background-color: red;
+			text-align: center;
+		}
+		</style>
+	</head>
+	<body>
+	<ul> 
+			<span>
+				<li style="float:left"> <a ><img src="static/ica_logo.png" width="35" height="35" /> </a> </li>
+				<li style='float: left;'> <a ><font style="font-size: 200%" color= "white">Request Raised For {{session.user}} </font></a> </li>
+				<li><a  href="http://10.102.112.150/logout" ><font style="font-size: 200%" color= "white">Logout</font></a></li>
+				<li><a   href="http://10.102.112.150/unixcaccessrequest" > <font style="font-size: 200%" color= "white" >Raise New Request</font></a></li>
+				<li><a   href="http://10.102.112.150/home" > <font style="font-size: 200%" color= "white" >Home</font></a></li>
+				
+			</span>
+		</ul><br>
+		<div class="container" >
+		
+			<table id =  "requests" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%" >
+				<tr>
+					<th>Request Id </th>
+					<th> Requested For	</th>
+					<th>Requested Date</th>
+					<th>List of Server </th>
+					<th>Status</th>
+					<th>Click Here To See More Details</th>
+				</tr>
+				{% for item in requests %}
+				<tr>
+					<td>{{item.request_id}}</td>
+					<td>{{item.requested_for}}</td>
+					<td> {{item.datetime}}
+					<td>{{item.server_list_final}}</td>
+					<td>{{item.status}}</td>
+					<td>    <a href={{item.link}} >Click Here To See More Details/Approve</a></td>
+				</tr>
+				{% endfor %}
+			</table>	
+		</div>
+	</body>
+</html>

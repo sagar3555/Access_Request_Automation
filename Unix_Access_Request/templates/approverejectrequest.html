@@ -1,0 +1,163 @@
+<html>
+	<head>
+		<link rel="stylesheet" media="screen" href="{{url_for('static', filename='bootstrap.min.css')}}" >
+		<link rel="stylesheet" media="screen" href="{{url_for('static', filename='bootstrap-theme.min.css')}}" >
+		<script src="{{url_for('static', filename='jquery.min.js')}}"> </script>
+		
+	</head>
+	<body>
+		<div class="container" >
+			<a href="http://10.102.112.150/home" >Click Here To Go To HomePage</a> 
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="http://10.102.112.150/unixcaccessrequest" >Click Here To Raise New Request</a>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<a href="http://10.102.112.150/logout" >Click Here To Logout</a>
+			<h3> Request Details </h3>
+			<table class="table table-bordered">
+				<tr>
+					<td>Requested For  </td>
+					<td>{{requested_for_id}} </td>
+				</tr>
+				
+				<tr>
+					<td>Requested date  </td>
+					<td>{{datetime}} </td>
+				</tr>
+				
+				<tr>
+					<td>Manager Email id  </td>
+					<td>{{manager_email_id}} </td>
+				</tr>
+				
+				
+				<tr>
+					<td>List of server's requested for access  </td>
+					<td>{{server_list_final}} </td>
+				</tr>
+				
+				<tr>
+					<td>User need to switch to Application User  </td>
+					<td>{{application_user}} </td>
+				</tr>
+				
+				<tr>
+					<td>Application user Names </td>
+					<td>{{application_user_names}} </td>
+				</tr>
+				
+				<tr>
+					<td>Reason For Access </td>
+					<td>{{reason}} </td>
+				</tr>
+				
+				<tr>
+					<td>User need to switch to Specific User </td>
+					<td>{{specific_group}} </td>
+				</tr>
+				
+				<tr>
+					<td>Specific User Names </td>
+					<td>{{specific_group_names}} </td>
+				</tr>
+				
+				<tr>
+					<td>Status</td>
+					<td id = "status"> {{status}} </td>
+				</tr>
+				
+				
+				
+				<tr id= 'hide/show'>
+					<td>
+						Approve / Reject 
+					</td>
+					
+					<td>
+						<form  action=""  method="post" role="form" >
+							<input type="text" style="display: none;" class="form-control" name="approved/rejected" id="approved/rejected" value=""  readOnly /><br />
+							<button name = "approve" type="submit" onClick="approveOrReject ('approve') ;confSubmitApprove(this.form);" class="btn btn-success">Approve</button>
+							<button name = "reject" type="submit" onClick="approveOrReject ('reject');confSubmitReject(this.form);" class="btn btn-danger">Reject</button>
+						</form>
+					</td>
+					
+				</tr>
+			</table>
+			
+		</div>
+		
+		<script>
+		
+				function approveOrReject (arg){
+					console.log(arg)
+					if  (arg=='approve'){
+						document.getElementById("approved/rejected").value = 'Approved'
+					}
+					else if  (arg = 'reject'){
+						document.getElementById("approved/rejected").value = 'Rejected'
+					}
+				}
+			
+				function confSubmitApprove(form) {
+					
+					if (confirm("Are you sure you want to Approve ?")) {
+					form.submit();
+					}
+
+					else {
+					alert("You decided to not submit the form!");
+					}
+				}
+				
+				function confSubmitReject(form) {
+					
+					if (confirm("Are you sure you want to Reject ?")) {
+					form.submit();
+					}
+
+					else {
+					alert("You decided to not submit the form!");
+					}
+				}
+				
+				function HideShow () {
+					
+					var status = "{{status}}"
+					console.log(status)
+					if ((status == 'Request Approved') || (status == 'Request Rejected')){
+						var element = document.getElementById('hide/show');
+						element.style.display = 'none'
+					}
+				}
+				window.onload = HideShow();
+				
+				function HideShow1 () {
+					
+					var requested_for = "{{requested_for_id}}"
+					var manager_id = "{{manager_id}}"
+					console.log(status)
+					if ("{{session.user}}"!= "{{manager_id}}"){
+						var element = document.getElementById('hide/show');
+						element.style.display = 'none'
+					}
+				}
+				window.onload = HideShow1();
+				
+				
+		</script>
+		
+		
+		
+		
+	</body>
+
+
+
+</html>

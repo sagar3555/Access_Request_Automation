@@ -1,0 +1,1297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+
+
+    <title> Unix Access Request </title>
+    <link rel="stylesheet" media="screen" href ="static/bootstrap.min.css">
+	<script src="static/jquery.min.js"></script>
+
+	<style type = "text/css">
+	
+	 .blink{
+		font-size: 12px;
+		color: rgb (0, 137, 226);
+		
+		animation: blink 1s infinite;
+	 }
+	 
+	 @keyframes blink{
+		0%{opacity: 1;}
+		75%{opacity: 1;}
+		76%{ opacity: 0;}
+		100%{opacity: 0;}
+	</style>
+       
+	
+</head>
+
+<body>
+
+<div class="container">
+{{ form.csrf }}
+<div style='float: right;'> <a href="http://10.102.112.150/logout" >Click Here To Logout</a></div> 
+<h2>Access Request Form </h2>
+<form  action="" method="post" role="form">
+
+<div class="form-group">
+<label> Requesting for User Id </label> <br>
+<input type="search" id ="user" list="users" class="form-control" name="user" value ={{session.user}} required /> <br />
+
+<label> Do You Have Access To Any of The Unix/Linux Server : </label> <br>
+<input type="radio" id  = "access" name="access" onclick = "setCheckBoxValue('Y','access')"   required />Yes &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+<input type="radio" id  = "access" name="access"  onclick = "setCheckBoxValue('N','access')" />No <br />
+
+<div id  = "Server_List">
+<label>Name's Of Server Where You Need Access : </label> <br />
+<button type="button"  style="display: all ;" class  = "btn btn-success" id="edit" onclick =" displayButtons (['add','remove'])"  value="Edit">Click here to add more / remove server  </button> 
+<button type="button"  style="display: none;" class  = "btn btn-success" id="done" onclick =" hideButtons (['add','remove'])"  value="Y">Click here when finished adding  </button>
+
+
+<button type="button"  style="display: none;"  class  = "btn btn-success" id="add" onclick =" add_fields()"  value="Add More">Add  </button> 
+<button  type="button" style="display: none;"   class  = "btn btn-danger" id="remove" onclick="remove_Fields();" value="remove" />Remove </button> </br>
+<input type="text" style="display: none;" class="form-control" name="server_list_final" id="server_list_final" value=""  readOnly /><br />
+<input type="search" id ="server_list1" list="nodes" class="form-control" name="server_list"  placeholder ='Type Server Name Here ' required /> <br />
+</div>
+
+<label>Do You Need To Switch To Any Application User</label><br />
+<input type="radio" id  ="application_user" name="application_user"  onclick="toggleApplicationUser('Y');setCheckBoxValue('Y','application_user')" required />Yes &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+<input type="radio" id  ="application_user" name="application_user"  onclick="toggleApplicationUser('N');setCheckBoxValue('N','application_user')"/>No<br />
+
+
+<label>Name of The Application User</label><br />
+<input type="text" class="form-control" name="application_user_names"  placeholder=" Type here application user names " id="txtText1" readOnly required /><br />
+
+
+<label>Reason For Access : </label> <br />  
+<input type="text" class="form-control" name="reason" id  = "reason" placeholder="Mention the reason for access "  required /> <br /> 
+
+
+<label>Contact No With  Country Code : </label> <br />
+<input type="text" class="form-control" name="contact" id ="contact" title  = "Please provide correct Contact no with country code example : +91xxxxxxxxxx , +46xxxxxxxxx" pattern = "([+][9][1][0-9]{10})|([+][4][6][0-9]{9})" value={{contactno}} required /> <br /> 
+<p class="blink" style="color:red; display: block;">Did we get your contact details correct? If not, please edit.</p>
+
+<label>Do You Need Access To Any Specific Group :</label><br />
+<input type="radio" id  ="specific_group" name="specific_group" onclick="toggleSpecificUser('Y');setCheckBoxValue('Y','specific_group')" required />Yes &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+<input type="radio" id  ="specific_group" name="specific_group"  onclick="toggleSpecificUser('N');setCheckBoxValue('N','specific_group')"/>No<br />
+
+
+<label>Specific Group Names : </label> <br />
+<input type="text" class="form-control" name="specific_group_names" id="txtText2"  placeholder="Type here specific group names"  readOnly />
+
+
+<input type="text" style="display: none;" class="form-control" name="count" id="count" value="None"  readOnly /><br />
+<input type="text" style="display: none;" class="form-control" name="server_list_final" id="server_list_final" value="None"  readOnly  required /><br />
+
+
+
+</div>
+<button type="submit" onClick="confSubmit(this.form);" class="btn btn-success">Submit</button>
+</form>
+<br>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+ 
+        {% for message in messages %}
+            {% if "Error" not in message[1]: %}
+                <div class="alert alert-info">
+                <strong>Success! </strong> {{ message[1] }}
+                </div>
+            {% endif %}
+ 
+            {% if "Error" in message[1]: %}
+                <div class="alert alert-warning">
+                {{ message[1] }}
+                </div>
+            {% endif %}
+        {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+
+
+
+</div>
+
+
+
+<datalist id  = 'users'>
+{% for item in reporteelist %}
+    <option value="{{ item }}">{{ item }}</option>
+{% endfor %}
+</datalist>
+
+
+
+<datalist id  = 'nodes'>
+<option value="ABERLOUR" />
+<option value="AFIL" />
+<option value="ALDRIN" />
+<option value="ALFIE" />
+<option value="ANCNOC" />
+<option value="ANEMONE" />
+<option value="AOB-DEPM" />
+<option value="ARRAN" />
+<option value="ASTROTRAIN" />
+<option value="AUCHROISK" />
+<option value="AURELIUS" />
+<option value="BAKUNIN" />
+<option value="BALTIC" />
+<option value="BALVENIE" />
+<option value="BAUGE" />
+<option value="BAYTA" />
+<option value="BEAMON" />
+<option value="BEARBERRY" />
+<option value="BEAVERBERRY" />
+<option value="BELLS" />
+<option value="BENRIACH" />
+<option value="BENRINNESS" />
+<option value="BENZAN" />
+<option value="BEREL" />
+<option value="BETSLA" />
+<option value="BIFUR" />
+<option value="BILLING" />
+<option value="BLADNOCH" />
+<option value="BLASTER" />
+<option value="BLENNY" />
+<option value="BOFUR" />
+<option value="BORR" />
+<option value="BOYZONE" />
+<option value="BRING" />
+<option value="BRORA" />
+<option value="BRYNHILD" />
+<option value="BUDERA" />
+<option value="BYLEIST" />
+<option value="CABLE" />
+<option value="CANDIRU" />
+<option value="CASH" />
+<option value="CDFV-DEPM" />
+<option value="CDFVER-B15" />
+<option value="CDFVER-L18" />
+<option value="CICERO" />
+<option value="CINCO" />
+<option value="COLLYER" />
+<option value="COMPOR" />
+<option value="CONVALMORE" />
+<option value="CORAL" />
+<option value="CORNERCREEK" />
+<option value="CRANBERRY" />
+<option value="CROCKETT" />
+<option value="DANPATCH" />
+<option value="DEVERS" />
+<option value="DFC-DEPM" />
+<option value="DHL" />
+<option value="DUFFTOWN" />
+<option value="ELDERBERRY" />
+<option value="ELVETT" />
+<option value="ERIC" />
+<option value="ERIKSEN" />
+<option value="FEDEX" />
+<option value="FLAMINGO" />
+<option value="FLO" />
+<option value="FORESTER" />
+<option value="GANG" />
+<option value="GERALD" />
+<option value="GERDA" />
+<option value="GIRLYBERRY" />
+<option value="GJALP" />
+<option value="GLAM" />
+<option value="GLENBRETON" />
+<option value="GLENDEVERON" />
+<option value="GLENDULLAN" />
+<option value="GLENESK" />
+<option value="GLENFARCLAS" />
+<option value="GLENFOYLE" />
+<option value="GOOSEBERRY" />
+<option value="GOWRON" />
+<option value="GRAND" />
+<option value="GRANTS" />
+<option value="GREIP" />
+<option value="GRIMLOCK" />
+<option value="GURGLE" />
+<option value="HARLA" />
+<option value="HAUT" />
+<option value="HERMIAS" />
+<option value="HERREYS" />
+<option value="HEVRING" />
+<option value="HOBER" />
+<option value="HORSE" />
+<option value="HREIDMAR" />
+<option value="HRYM" />
+<option value="HYRROKKIN" />
+<option value="IMPERIAL" />
+<option value="IOR" />
+<option value="JACQUES" />
+<option value="JAIM" />
+<option value="JANOV" />
+<option value="JAZZ" />
+<option value="JETFIRE" />
+<option value="JOHN" />
+<option value="JOHNNYDRUM" />
+<option value="JORANE" />
+<option value="JORANUM" />
+<option value="JUKSAKKA" />
+<option value="KARHU" />
+<option value="KARIMA" />
+<option value="KEFIR" />
+<option value="KEPOL" />
+<option value="KININVIE" />
+<option value="KIRK" />
+<option value="KNOCKDHU" />
+<option value="KOLGA" />
+<option value="KORRIS" />
+<option value="KRILL" />
+<option value="KUNIVAS" />
+<option value="LAFORGE" />
+<option value="LAPPFELA" />
+<option value="LENVIK" />
+<option value="LETEK" />
+<option value="LIMEBERRY" />
+<option value="LINGONBERRY" />
+<option value="LOCHSIDE" />
+<option value="MAAEMONEN" />
+<option value="MALCOLM" />
+<option value="MARTOK" />
+<option value="MAXIMUS" />
+<option value="MEGATRON" />
+<option value="MENUDO" />
+<option value="MFT-NFS" />
+<option value="MFTV-NFS" />
+<option value="MISFIRE" />
+<option value="MORTLACH" />
+<option value="MORTON" />
+<option value="MOSBY" />
+<option value="MURTAUGH" />
+<option value="MYRICKS" />
+<option value="NARCISSUS" />
+<option value="NEMO" />
+<option value="NIGEL" />
+<option value="NKOTB" />
+<option value="NYPON" />
+<option value="O3_VCA_1" />
+<option value="ODEN" />
+<option value="ODEN-DBADM01" />
+<option value="ODEN-DBADM02" />
+<option value="OEL67TPL" />
+<option value="OPS1" />
+<option value="ORACLE" />
+<option value="ORACLE VM MANAGER" />
+<option value="ORACLEVM" />
+<option value="ORWELL" />
+<option value="PALVER" />
+<option value="PANDILLA" />
+<option value="PEACH" />
+<option value="PEARL" />
+<option value="PELLEAS" />
+<option value="PELORAT" />
+<option value="PELOT" />
+<option value="PETUNIA" />
+<option value="PHILURA" />
+<option value="PICARD" />
+<option value="PIFF" />
+<option value="POIROT" />
+<option value="PORKY" />
+<option value="PRICEBOMB" />
+<option value="PRICERUNNER" />
+<option value="PRICEWATCH" />
+<option value="PRIME-NEW" />
+<option value="PROVIVA" />
+<option value="PROWL" />
+<option value="PUFF" />
+<option value="PUSSEL" />
+<option value="QUATRO" />
+<option value="QUILT" />
+<option value="QUINTUS" />
+<option value="RADISSON" />
+<option value="RATCHET" />
+<option value="REDTEST" />
+<option value="RIBERRY" />
+<option value="RIGGS" />
+<option value="RINGO" />
+<option value="RIVERTON" />
+<option value="RODRIC" />
+<option value="ROGUE" />
+<option value="SALMONBERRY" />
+<option value="SARAKKA" />
+<option value="SASDEV" />
+<option value="SEIS" />
+<option value="SENNETT" />
+<option value="SERMAK" />
+<option value="SHARON" />
+<option value="SIETE" />
+<option value="SKOGSFRU" />
+<option value="SKOGSLILJA" />
+<option value="SKUFFEN" />
+<option value="SKYBERT" />
+<option value="SKYE" />
+<option value="SKYWARP" />
+<option value="SMYRNO" />
+<option value="SOLBORG" />
+<option value="SOLOK" />
+<option value="STARSKY" />
+<option value="STINSON" />
+<option value="STORSYSSLA" />
+<option value="STORYXNE" />
+<option value="SUTT" />
+<option value="TAKETHAT" />
+<option value="TALC" />
+<option value="TAMWILE" />
+<option value="TANDHU" />
+<option value="TANGO" />
+<option value="TAURIK" />
+<option value="TFORD" />
+<option value="TIN" />
+<option value="TOR" />
+<option value="TOR-DBADM01" />
+<option value="TOR-DBADM02" />
+<option value="TORAN" />
+<option value="TOYSAVINGS" />
+<option value="TREG" />
+<option value="TRES" />
+<option value="TUBBS" />
+<option value="TURBOR" />
+<option value="TURG" />
+<option value="TUVOK" />
+<option value="TWENGA" />
+<option value="TWER" />
+<option value="UX010P011" />
+<option value="UX010P012" />
+<option value="UX010P021" />
+<option value="UX010P022" />
+<option value="UX010P101" />
+<option value="UX010P102" />
+<option value="UX010PAS101" />
+<option value="UX010PAS201" />
+<option value="UX010PIS001" />
+<option value="UX010PIS003" />
+<option value="UX010PIS021" />
+<option value="UX010PLS001" />
+<option value="UX010PLS002" />
+<option value="UX010PWS001" />
+<option value="UX010TAS002" />
+<option value="UX010TWS002" />
+<option value="UX010VAS001" />
+<option value="UX020P001" />
+<option value="UX030P001" />
+<option value="UX030P002" />
+<option value="UX030PAS001" />
+<option value="UX030T001" />
+<option value="UX040PAS001" />
+<option value="UX040PAS002" />
+<option value="UX040VAS001" />
+<option value="UX050PDB901" />
+<option value="UX050TDB001" />
+<option value="UX050TDB002" />
+<option value="UX202P001" />
+<option value="UX202P002" />
+<option value="UX203P101" />
+<option value="UX203P102" />
+<option value="UX301DAS001" />
+<option value="UX301DAS002" />
+<option value="UX301DAS003" />
+<option value="UX301P101" />
+<option value="UX301P102" />
+<option value="UX301P110" />
+<option value="UX301P111" />
+<option value="UX301P112" />
+<option value="UX301P121" />
+<option value="UX301P150" />
+<option value="UX301P201" />
+<option value="UX301P202" />
+<option value="UX301PAS003" />
+<option value="UX301T004" />
+<option value="UX301T005" />
+<option value="UX301T006" />
+<option value="UX301T007" />
+<option value="UX301T008" />
+<option value="UX301TAS001" />
+<option value="UX301TAS002" />
+<option value="UX301TAS201" />
+<option value="UX301TAS202" />
+<option value="UX301TAS203" />
+<option value="UX301TAS204" />
+<option value="UX301TAS211" />
+<option value="UX301TAS212" />
+<option value="UX301TDB001" />
+<option value="UX301TDB002" />
+<option value="UX301TDB101" />
+<option value="UX301TDB201" />
+<option value="UX301V101" />
+<option value="UX301V102" />
+<option value="UX301V110" />
+<option value="UX301V111" />
+<option value="UX301V112" />
+<option value="UX301V121" />
+<option value="UX301V150" />
+<option value="UX301V201" />
+<option value="UX301V202" />
+<option value="UX301VAS001" />
+<option value="UX301VDB101" />
+<option value="UX301VDB102" />
+<option value="UX302P101" />
+<option value="UX302P102" />
+<option value="UX302PDB001" />
+<option value="UX302PDB002" />
+<option value="UX302T003" />
+<option value="UX302TDB002" />
+<option value="UX302TDB005" />
+<option value="UX302V101" />
+<option value="UX302V102" />
+<option value="UX302VDB002" />
+<option value="UX302VDB003" />
+<option value="UX302VDB011" />
+<option value="UX302VDB012" />
+<option value="UX303DAS001" />
+<option value="UX303P001" />
+<option value="UX303PAS001" />
+<option value="UX303TAS001" />
+<option value="UX303V001" />
+<option value="UX303VAS001" />
+<option value="UX305D001" />
+<option value="UX305D002" />
+<option value="UX305D101" />
+<option value="UX305D102" />
+<option value="UX305D501" />
+<option value="UX305D502" />
+<option value="UX305P001" />
+<option value="UX305P002" />
+<option value="UX305P101" />
+<option value="UX305P102" />
+<option value="UX305P601" />
+<option value="UX305P602" />
+<option value="UX305P701" />
+<option value="UX305PAS011" />
+<option value="UX305PAS012" />
+<option value="UX305T001" />
+<option value="UX305T101" />
+<option value="UX305T102" />
+<option value="UX305T501" />
+<option value="UX305TAS011" />
+<option value="UX305V001" />
+<option value="UX305V002" />
+<option value="UX305V101" />
+<option value="UX305V102" />
+<option value="UX305VAS011" />
+<option value="UX306PIS101" />
+<option value="UX306T001" />
+<option value="UX306VIS101" />
+<option value="UX307P001" />
+<option value="UX307P101" />
+<option value="UX307T001" />
+<option value="UX307T101" />
+<option value="UX307V001" />
+<option value="UX307V101" />
+<option value="UX308PAS001" />
+<option value="UX308PAS002" />
+<option value="UX308T001" />
+<option value="UX308TAS001" />
+<option value="UX308TAS002" />
+<option value="UX308VAS002" />
+<option value="UX308VAS003" />
+<option value="UX309P001" />
+<option value="UX309T001" />
+<option value="UX309TAS002" />
+<option value="UX309V001" />
+<option value="UX310T001" />
+<option value="UX310TAS001" />
+<option value="UX311P001" />
+<option value="UX311P002" />
+<option value="UX311P003" />
+<option value="UX311P004" />
+<option value="UX311P005" />
+<option value="UX311P006" />
+<option value="UX311P007" />
+<option value="UX311P011" />
+<option value="UX311P012" />
+<option value="UX311P013" />
+<option value="UX311P014" />
+<option value="UX311P015" />
+<option value="UX311PAS016" />
+<option value="UX311PAS017" />
+<option value="UX311PAS018" />
+<option value="UX311PAS019" />
+<option value="UX311PAS020" />
+<option value="UX311PAS201" />
+<option value="UX311PAS202" />
+<option value="UX311PAS203" />
+<option value="UX311PDB101" />
+<option value="UX311PDB102" />
+<option value="UX311PDB201" />
+<option value="UX311PDB202" />
+<option value="UX311PDB205" />
+<option value="UX311PDB206" />
+<option value="UX311T001" />
+<option value="UX311T002" />
+<option value="UX311T003" />
+<option value="UX311T004" />
+<option value="UX311T005" />
+<option value="UX311T006" />
+<option value="UX311T007" />
+<option value="UX311T008" />
+<option value="UX311T015" />
+<option value="UX311TAS001" />
+<option value="UX311TAS003" />
+<option value="UX311TAS004" />
+<option value="UX311TAS005" />
+<option value="UX311TAS006" />
+<option value="UX311TAS007" />
+<option value="UX311TAS020" />
+<option value="UX311V001" />
+<option value="UX311V002" />
+<option value="UX311V003" />
+<option value="UX311V004" />
+<option value="UX311V005" />
+<option value="UX311V006" />
+<option value="UX311V007" />
+<option value="UX311V011" />
+<option value="UX311V012" />
+<option value="UX311V013" />
+<option value="UX311V014" />
+<option value="UX311V015" />
+<option value="UX311VAS001" />
+<option value="UX311VAS003" />
+<option value="UX311VAS101" />
+<option value="UX311VAS102" />
+<option value="UX311VAS201" />
+<option value="UX311VAS202" />
+<option value="UX311VAS203" />
+<option value="UX311VDB101" />
+<option value="UX311VDB102" />
+<option value="UX311VDB201" />
+<option value="UX311VDB205" />
+<option value="UX311VDB206" />
+<option value="UX313P001" />
+<option value="UX313P002" />
+<option value="UX313V001" />
+<option value="UX313V002" />
+<option value="UX314D103" />
+<option value="UX314D104" />
+<option value="UX314D123" />
+<option value="UX314D124" />
+<option value="UX314D201" />
+<option value="UX314D202" />
+<option value="UX314D222" />
+<option value="UX314D301" />
+<option value="UX314D401" />
+<option value="UX314DAS126" />
+<option value="UX314DAS127" />
+<option value="UX314DAS701" />
+<option value="UX314DAS802" />
+<option value="UX314DDB223" />
+<option value="UX314DDB601" />
+<option value="UX314DDB702" />
+<option value="UX314DDB801" />
+<option value="UX314PAS503" />
+<option value="UX314PAS505" />
+<option value="UX314PAS512" />
+<option value="UX314PAS513" />
+<option value="UX314PAS514" />
+<option value="UX314PAS515" />
+<option value="UX314PAS601" />
+<option value="UX314PAS901" />
+<option value="UX314PDB507" />
+<option value="UX314PDB516" />
+<option value="UX314PDB517" />
+<option value="UX314PDB603" />
+<option value="UX314PDB901" />
+<option value="UX314PDB902" />
+<option value="UX314PDB904" />
+<option value="UX314PWS501" />
+<option value="UX314PWS510" />
+<option value="UX314PWS511" />
+<option value="UX314PWS518" />
+<option value="UX314PWS519" />
+<option value="UX314T150" />
+<option value="UX314T151" />
+<option value="UX314T160" />
+<option value="UX314T162" />
+<option value="UX314T213" />
+<option value="UX314T250" />
+<option value="UX314T260" />
+<option value="UX314T311" />
+<option value="UX314TAS401" />
+<option value="UX314TAS801" />
+<option value="UX314TDB701" />
+<option value="UX314TDB802" />
+<option value="UX314TWS164" />
+<option value="UX314TWS165" />
+<option value="UX314TWS166" />
+<option value="UX314TWS167" />
+<option value="UX314VAS250" />
+<option value="UX314VAS251" />
+<option value="UX314VAS503" />
+<option value="UX314VAS505" />
+<option value="UX314VAS512" />
+<option value="UX314VAS513" />
+<option value="UX314VAS514" />
+<option value="UX314VAS515" />
+<option value="UX314VAS601" />
+<option value="UX314VAS901" />
+<option value="UX314VDB350" />
+<option value="UX314VDB508" />
+<option value="UX314VDB516" />
+<option value="UX314VDB517" />
+<option value="UX314VDB603" />
+<option value="UX314VDB801" />
+<option value="UX314VDB802" />
+<option value="UX314VDB902" />
+<option value="UX314VWS501" />
+<option value="UX314VWS510" />
+<option value="UX314VWS511" />
+<option value="UX314VWS518" />
+<option value="UX314VWS519" />
+<option value="UX314VWS520" />
+<option value="UX314VWS521" />
+<option value="UX315D001" />
+<option value="UX315D101" />
+<option value="UX315D201" />
+<option value="UX315P001" />
+<option value="UX315P002" />
+<option value="UX315P101" />
+<option value="UX315P102" />
+<option value="UX315P201" />
+<option value="UX315P202" />
+<option value="UX315P301" />
+<option value="UX315P302" />
+<option value="UX315T001" />
+<option value="UX315T101" />
+<option value="UX315T201" />
+<option value="UX315TAS001" />
+<option value="UX315V001" />
+<option value="UX315V002" />
+<option value="UX315V101" />
+<option value="UX315V102" />
+<option value="UX315V201" />
+<option value="UX315V202" />
+<option value="UX315V301" />
+<option value="UX315V302" />
+<option value="UX316DAS001" />
+<option value="UX316DAS002" />
+<option value="UX316P001" />
+<option value="UX316P002" />
+<option value="UX316P003" />
+<option value="UX316P201" />
+<option value="UX316PAS001" />
+<option value="UX316PAS002" />
+<option value="UX316T002" />
+<option value="UX316T003" />
+<option value="UX316TAS001" />
+<option value="UX316TAS003" />
+<option value="UX316TDB001" />
+<option value="UX316V001" />
+<option value="UX316V002" />
+<option value="UX316V003" />
+<option value="UX316V201" />
+<option value="UX316VAS001" />
+<option value="UX316VAS002" />
+<option value="UX317DAS001" />
+<option value="UX317P001" />
+<option value="UX317PAS001" />
+<option value="UX317PAS002" />
+<option value="UX317PAS003" />
+<option value="UX317TAS001" />
+<option value="UX317TAS002" />
+<option value="UX317TAS003" />
+<option value="UX317V001" />
+<option value="UX317VAS001" />
+<option value="UX317VAS002" />
+<option value="UX317VAS003" />
+<option value="UX318P001" />
+<option value="UX318P002" />
+<option value="UX318P003" />
+<option value="UX318P004" />
+<option value="UX318P101" />
+<option value="UX318P102" />
+<option value="UX321PAS101" />
+<option value="UX321PDB101" />
+<option value="UX321TAS002" />
+<option value="UX321TAS011" />
+<option value="UX321TDB001" />
+<option value="UX321TDB011" />
+<option value="UX321VAS101" />
+<option value="UX321VDB001" />
+<option value="UX322PAS001" />
+<option value="UX322PDB001" />
+<option value="UX322TAS001" />
+<option value="UX322VAS001" />
+<option value="UX322VAS002" />
+<option value="UX323PAS001" />
+<option value="UX323PAS002" />
+<option value="UX323PAS051" />
+<option value="UX323PAS052" />
+<option value="UX323PDB001" />
+<option value="UX323PDB002" />
+<option value="UX323TAS010" />
+<option value="UX323TAS011" />
+<option value="UX323TAS051" />
+<option value="UX323TAS052" />
+<option value="UX323VAS001" />
+<option value="UX323VAS002" />
+<option value="UX323VAS003" />
+<option value="UX323VAS051" />
+<option value="UX323VAS052" />
+<option value="UX323VDB001" />
+<option value="UX323VDB002" />
+<option value="UX324DAS001" />
+<option value="UX324PAS001" />
+<option value="UX324TAS001" />
+<option value="UX324VAS001" />
+<option value="UX325DAS003" />
+<option value="UX325DAS004" />
+<option value="UX325DDB001" />
+<option value="UX325PAS001" />
+<option value="UX325PAS002" />
+<option value="UX325PAS011" />
+<option value="UX325PAS012" />
+<option value="UX325PAS013" />
+<option value="UX325PDB001" />
+<option value="UX325PDB002" />
+<option value="UX325PIS001" />
+<option value="UX325PIS002" />
+<option value="UX325PIS003" />
+<option value="UX325PIS004" />
+<option value="UX325PIS005" />
+<option value="UX325TAS001" />
+<option value="UX325TAS002" />
+<option value="UX325TAS003" />
+<option value="UX325TAS004" />
+<option value="UX325TAS005" />
+<option value="UX325TAS011" />
+<option value="UX325TAS012" />
+<option value="UX325VAS001" />
+<option value="UX325VAS002" />
+<option value="UX325VAS011" />
+<option value="UX325VAS012" />
+<option value="UX325VAS013" />
+<option value="UX325VDB001" />
+<option value="UX325VDB002" />
+<option value="UX326PAS001" />
+<option value="UX326VAS001" />
+<option value="UX326VAS002" />
+<option value="UX328PAS001" />
+<option value="UX328PAS002" />
+<option value="UX328PAS003" />
+<option value="UX328VAS001" />
+<option value="UX328VAS002" />
+<option value="UX328VAS003" />
+<option value="UX328VAS004" />
+<option value="UX329PAS001" />
+<option value="UX329PAS002" />
+<option value="UX329PAS003" />
+<option value="UX329PAS051" />
+<option value="UX329PAS052" />
+<option value="UX329PAS053" />
+<option value="UX329PAS054" />
+<option value="UX329PAS055" />
+<option value="UX329PAS056" />
+<option value="UX329PAS057" />
+<option value="UX329PAS058" />
+<option value="UX329PAS101" />
+<option value="UX329PAS102" />
+<option value="UX329PAS151" />
+<option value="UX329PAS152" />
+<option value="UX329PAS201" />
+<option value="UX329PAS251" />
+<option value="UX329PAS401" />
+<option value="UX329TAS001" />
+<option value="UX329TAS002" />
+<option value="UX329TAS003" />
+<option value="UX329TAS004" />
+<option value="UX329TAS101" />
+<option value="UX329TAS102" />
+<option value="UX330PAS001" />
+<option value="UX331PDB001" />
+<option value="UX331VAS001" />
+<option value="UX331VDB001" />
+<option value="UX332PAS001" />
+<option value="UX332PAS002" />
+<option value="UX332TAS001" />
+<option value="UX333TDB001" />
+<option value="UX334DDB001" />
+<option value="UX334PAS001" />
+<option value="UX334PDB001" />
+<option value="UX334PDB002" />
+<option value="UX334TDB001" />
+<option value="UX334VDB001" />
+<option value="UX334VDB002" />
+<option value="UX335DAS001" />
+<option value="UX335PAS001" />
+<option value="UX335TAS001" />
+<option value="UX335VAS001" />
+<option value="UX336PDB001" />
+<option value="UX336PDB002" />
+<option value="UX336PDV002" />
+<option value="UX336VDB001" />
+<option value="UX336VDB002" />
+<option value="UX337PAS001" />
+<option value="UX337PAS002" />
+<option value="UX337PDB001" />
+<option value="UX337PDB002" />
+<option value="UX337PWS001" />
+<option value="UX337PWS002" />
+<option value="UX337TAS001" />
+<option value="UX337TAS002" />
+<option value="UX337TDB001" />
+<option value="UX337TDB002" />
+<option value="UX337VAS001" />
+<option value="UX337VAS002" />
+<option value="UX337VDB001" />
+<option value="UX337VDB002" />
+<option value="UX337VWS001" />
+<option value="UX337VWS002" />
+<option value="UX338PAS002" />
+<option value="UX338PAS003" />
+<option value="UX338TDB001" />
+<option value="UX338VAS002" />
+<option value="UX338VAS003" />
+<option value="UX339PAS101" />
+<option value="UX339PAS102" />
+<option value="UX339PAS103" />
+<option value="UX339PAS104" />
+<option value="UX339PAS105" />
+<option value="UX339TAS001" />
+<option value="UX339TAS101" />
+<option value="UX339TAS102" />
+<option value="UX339TAS103" />
+<option value="UX339TAS105" />
+<option value="UX339TAS106" />
+<option value="UX339TAS107" />
+<option value="UX339VAS001" />
+<option value="UX339VAS002" />
+<option value="UX339VAS003" />
+<option value="UX339VAS004" />
+<option value="UX339VAS005" />
+<option value="UX340PAS001" />
+<option value="UX340PAS002" />
+<option value="UX340PAS003" />
+<option value="UX340PAS101" />
+<option value="UX340TAS001" />
+<option value="UX340VAS001" />
+<option value="UX340VAS002" />
+<option value="UX340VAS003" />
+<option value="UX340VAS101" />
+<option value="UX341DAS001" />
+<option value="UX341PAS001" />
+<option value="UX341PDB001" />
+<option value="UX341TAS001" />
+<option value="UX341TDB001" />
+<option value="UX341VAS001" />
+<option value="UX341VDB001" />
+<option value="UX342PDB001" />
+<option value="UX342PDB002" />
+<option value="UX342TDB001" />
+<option value="UX342VDB001" />
+<option value="UX342VDB002" />
+<option value="UX343DAS001" />
+<option value="UX400PAS001" />
+<option value="UX400T001" />
+<option value="UX400V001" />
+<option value="UX400V004" />
+<option value="UX400VAS001" />
+<option value="UX401P001" />
+<option value="UX401P002" />
+<option value="UX401V001" />
+<option value="UX401V002" />
+<option value="UX402P001" />
+<option value="UX402V001" />
+<option value="UX403DAS001" />
+<option value="UX403DAS002" />
+<option value="UX403DDB001" />
+<option value="UX403P001" />
+<option value="UX403PAS001" />
+<option value="UX403PDB101" />
+<option value="UX403V001" />
+<option value="UX403VAS001" />
+<option value="UX403VDB101" />
+<option value="UX404P001" />
+<option value="UX404T001" />
+<option value="UX404V001" />
+<option value="UX405P001" />
+<option value="UX405V001" />
+<option value="UX406P001" />
+<option value="UX406P002" />
+<option value="UX406P003" />
+<option value="UX406T001" />
+<option value="UX406T002" />
+<option value="UX406V001" />
+<option value="UX406V002" />
+<option value="UX406V003" />
+<option value="UX500PAS001" />
+<option value="UX500VAS001" />
+<option value="UX501PDB001" />
+<option value="UX501PDB002" />
+<option value="UX501TDB001" />
+<option value="UX501VDB001" />
+<option value="UX501VDB002" />
+<option value="UX502PDB001" />
+<option value="UX502PDB002" />
+<option value="UX502TDB001" />
+<option value="UX502VDB001" />
+<option value="UX502VDB002" />
+<option value="UX601PAS001" />
+<option value="UX601PAS010" />
+<option value="UX601PHV001" />
+<option value="UX601PHV002" />
+<option value="UX601PWS010" />
+<option value="UX601TAS010" />
+<option value="UX601TWS010" />
+<option value="UX601VAS010" />
+<option value="UX601VWS010" />
+<option value="UX602PAS001" />
+<option value="UX602PAS010" />
+<option value="UX602PHV001" />
+<option value="UX602PHV002" />
+<option value="UX602PWS010" />
+<option value="UX602TAS001" />
+<option value="UX602TAS010" />
+<option value="UX602TWS010" />
+<option value="UX602VAS010" />
+<option value="UX602VWS010" />
+<option value="UX701PAS001" />
+<option value="UX701PAS002" />
+<option value="UX701PAS011" />
+<option value="UX701PAS012" />
+<option value="UX701PAS801" />
+<option value="UX701PAS901" />
+<option value="UX701PAS911" />
+<option value="UX701PLB001" />
+<option value="UX701PLB002" />
+<option value="UX701PSE001" />
+<option value="UX701PSE002" />
+<option value="UX701PSE901" />
+<option value="UX701PWS001" />
+<option value="UX701PWS002" />
+<option value="UX701VAS001" />
+<option value="UX701VAS002" />
+<option value="UX701VAS011" />
+<option value="UX701VAS012" />
+<option value="UX701VAS201" />
+<option value="UX701VAS202" />
+<option value="UX701VAS801" />
+<option value="UX701VAS901" />
+<option value="UX701VAS911" />
+<option value="UX701VLB001" />
+<option value="UX701VLB002" />
+<option value="UX701VSE001" />
+<option value="UX701VSE002" />
+<option value="UX701VSE201" />
+<option value="UX701VSE901" />
+<option value="UX701VWS001" />
+<option value="UX701VWS002" />
+<option value="UX702PAS001" />
+<option value="UX702PAS002" />
+<option value="UX702PAS011" />
+<option value="UX702PAS012" />
+<option value="UX702PLB001" />
+<option value="UX702PLB002" />
+<option value="UX702PSE001" />
+<option value="UX702PSE002" />
+<option value="UX702PWS001" />
+<option value="UX702PWS002" />
+<option value="UX702VAS001" />
+<option value="UX702VAS002" />
+<option value="UX702VAS011" />
+<option value="UX702VAS012" />
+<option value="UX702VLB001" />
+<option value="UX702VLB002" />
+<option value="UX702VSE001" />
+<option value="UX702VSE002" />
+<option value="UX702VWS001" />
+<option value="UX702VWS002" />
+<option value="UX711PAS921" />
+<option value="UX711PAS931" />
+<option value="UX711TAS001" />
+<option value="UX711VAS001" />
+<option value="UX711VAS201" />
+<option value="UX711VAS202" />
+<option value="VALUEFIND" />
+<option value="VEKOR" />
+<option value="VERISOF" />
+<option value="VIDKUN" />
+<option value="VITALPRIX" />
+<option value="VORIK" />
+<option value="VORTEX" />
+<option value="VVSPRISEN" />
+<option value="WESTLIFE" />
+<option value="WHALEN" />
+<option value="WIENIS" />
+<option value="WINEBERRY" />
+<option value="WORF" />
+
+
+
+</datalist>
+
+<script  type="text/javascript"> 
+
+
+function toggleApplicationUser(opt){
+    if (opt == "Y"){
+		//console.log(document.getElementById("txtText1").readOnly)
+        document.getElementById("txtText1").readOnly = false;
+		document.getElementById("txtText1").required = true ;
+		console.log("inside toggle application user")
+	}
+    else {
+        document.getElementById('txtText1').readOnly = true;
+		document.getElementById("txtText1").required = false ;
+	}
+}
+
+
+
+function checkApplicationUser () {
+	if (document.getElementById("txtText1").readOnly == false ) {
+		if (document.getElementById("txtText1").value == ""){
+			alert("Application User must be filled out");
+			return false;
+		}
+	
+	}
+}
+
+
+
+
+
+function toggleSpecificUser(opt){
+    if (opt == 'Y'){
+        document.getElementById('txtText2').readOnly = false;
+		document.getElementById("txtText2").required = true ;
+	}
+    else{
+        document.getElementById('txtText2').readOnly = true;
+		document.getElementById("txtText2").required = false ;
+	}
+}
+
+
+function checkSpecificUser () {
+	if (document.getElementById("txtText2").readOnly == false ) {
+		if (document.getElementById("txtText2").value == ""){
+			alert("Specific User must be filled out");
+			return false;
+		}
+	
+	}
+}
+
+function checkReason () {
+		if (document.getElementById("reason").value == ""){
+			alert("reason must be filled out");
+			return false;
+		}
+}
+
+
+
+
+
+
+function setCheckBoxValue(box ,id ) {
+	if (box == 'Y'){
+		document.getElementById(id).value = "Y" ;
+	}
+	else if (box == 'N') {
+		console.log(box , id)
+		document.getElementById(id).value = "N" ;
+	}
+}
+
+function setUserField() {
+			var x = document.getElementById("users").options.length;
+			console.log(x)
+			if (x == 1) {
+				document.getElementById("user").readOnly = true ;
+			}
+            
+}
+window.onload = setUserField();
+
+
+
+function checkMandatory () {
+	try {
+		//console.log(document.getElementById("access").value );
+		//console.log('inside check manadatory')
+	if ((document.getElementById("access").value  == 'Y' || document.getElementById("access").value  == 'N') && (document.getElementById("application_user").value == 'Y' || document.getElementById("application_user").value == 'N' ) &&  (document.getElementById("specific_group").value == 'Y' || document.getElementById("specific_group").value == 'N'  )){
+		
+		//if (!$(this).find('access').is(':checked')) {
+			//alert(document.getElementById('access').value );
+        //}
+		//console.log('true')
+		return true ;
+		
+		}	
+	}
+	
+	catch (error) {
+	alert("Please Check the check box");
+	return false ;
+	}
+}
+
+function checkDone(){
+
+	if  (document.getElementById('done').value == "Y"){
+		return true ;
+	}
+	else {
+	alert ('Plese click on button :  Click here when finished adding ')
+	return false ;
+	}
+
+
+
+}
+
+
+
+
+function confSubmit(form) {
+			//set_Count();
+			finalServerList();
+			//document.getElementById("access").required = true;
+			//document.getElementById("application_user").required = true;
+			//document.getElementById("specific_group").required = true;
+			
+			//var checkBox = checkMandatory() ;
+			//var Done = checkDone() ;
+			//consloe.log(2) ;
+			//var check  = true ;
+			//console.log(checkDone())
+			
+			if (checkMandatory()  && checkApplicationUser() && checkSpecificUser() && checkReason() && checkDone() ){
+				if (confirm("Are you sure you want to submit the details ?")) {
+					form.submit();
+					//console.log(1)
+				}
+
+				else {
+				   alert("You decided to not submit the form!");
+				}
+			}
+}
+var count  = 1
+var temp = 1
+
+function add_fields() {
+   
+   var d = document.getElementById("Server_List");
+   count+=1
+   var text  = document.createElement('div');
+   text.innerHTML = "<input type='search' style ='display:all,' id = 'server_list"+count+"' list='nodes' class='form-control' name='server_list' placeholder='Type Server Name Here' value='' required />"
+   d.appendChild(text)
+   
+   return false ;
+   
+}
+function remove_Fields() {
+    if (count >= 2){
+		//console.log('server_list'+count)
+		var elem = document.getElementById('server_list'+count);
+		elem.parentNode.removeChild(elem);
+		count-=1
+    }
+}
+
+function set_Count (){
+	document.getElementById("count").value = count ;
+}
+
+function checkServerNames () {
+	var i;
+    for (i = 1; i <= count; i++) {
+	if  (document.getElementById('server_list'+i).value == ''){
+		alert("Please fill out the Server name ")
+		return false 
+	}
+	
+	}
+
+
+
+
+
+}
+
+
+function finalServerList () {
+//console.log(checkServerNames ())
+if  (checkServerNames () != false) {
+	var serverList = "" ;
+	var i;
+		for (i = 1; i <= count; i++) {
+		serverList += document.getElementById('server_list'+i).value+',';
+		var element = document.getElementById('server_list'+i);
+		element.style.display = 'none' ;
+		}
+	//console.log(serverList);
+	serverList = serverList.slice(0, -1);
+	document.getElementById("server_list_final").value = serverList ;
+	return true
+	}
+	else {
+	return false 
+	}
+}
+
+function displayButtons (argList) {
+
+var buttons = argList
+var i;
+//console.log(buttons) ;
+//console.log(buttons.length ) ;
+for (i = 1; i <=buttons.length ; i++) {
+    //document.getElementById(id).style.property = new style
+	//console.log(buttons[i-1])
+    var element = document.getElementById(buttons[i-1]);
+    element.style.display = null;
+    
+    }
+var element = document.getElementById('edit');
+element.style.display = 'none' ;
+var element = document.getElementById('done');
+element.style.display = null ;
+document.getElementById('done').value  = 'N' ;
+var t ;
+for (t = 1; t <=count ; t++) {
+	//console.log("t")
+	var element = document.getElementById('server_list'+t) ;
+	element.style.display = null ;
+	
+}
+
+}
+
+function hideButtons (argList) {
+
+if (finalServerList () == true ) {
+var buttons = argList
+var i;
+//console.log(buttons) ;
+//console.log(buttons.length ) ;
+for (i = 1; i <=buttons.length ; i++) {
+    //document.getElementById(id).style.property = new style
+	console.log(buttons[i-1])
+    var element = document.getElementById(buttons[i-1]);
+    element.style.display = 'none';
+    
+    }
+var element = document.getElementById('edit');
+element.style.display = null ;
+var element = document.getElementById('done');
+element.style.display = 'none' ;
+//finalServerList () ;
+var element = document.getElementById('server_list_final');
+element.style.display = null ;
+document.getElementById('done').value = 'Y' ;
+}
+}
+
+
+
+</script>
+</body>
+</html>
